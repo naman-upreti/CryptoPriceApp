@@ -24,6 +24,23 @@ load_dotenv()
 # Page expands to full width
 st.set_page_config(layout="wide")
 
+# API Key Management
+if 'api_key' not in st.session_state:
+    st.session_state.api_key = os.getenv("COINMARKETCAP_API_KEY", "")
+
+# Sidebar for API Key input
+with st.sidebar:
+    st.header("API Configuration")
+    api_key_input = st.text_input("Enter CoinMarketCap API Key", 
+                                 value=st.session_state.api_key,
+                                 type="password",
+                                 help="Get your API key from https://coinmarketcap.com/api/")
+    if api_key_input:
+        st.session_state.api_key = api_key_input
+        st.success("API Key saved for this session!")
+    else:
+        st.warning("Please enter a valid API key to use this app")
+
 # Main app tabs
 main_tabs = st.tabs(["Original Interface", "Enhanced Interface"])
 
@@ -61,7 +78,7 @@ with main_tabs[0]:
     currency = col1.selectbox('Select currency', ('USD', 'BTC', 'ETH'))
     
     # CoinMarketCap API setup
-    API_KEY = os.getenv("COINMARKETCAP_API_KEY")  # Get API key from environment variable
+    API_KEY = st.session_state.api_key  # Use the API key from session state
     BASE_URL = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
     
     # Cache data fetching from API
